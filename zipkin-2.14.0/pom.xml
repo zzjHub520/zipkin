@@ -1,0 +1,916 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Licensed to the Apache Software Foundation (ASF) under one or more
+    contributor license agreements.  See the NOTICE file distributed with
+    this work for additional information regarding copyright ownership.
+    The ASF licenses this file to You under the Apache License, Version 2.0
+    (the "License"); you may not use this file except in compliance with
+    the License.  You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache</groupId>
+    <artifactId>apache</artifactId>
+    <version>21</version>
+  </parent>
+
+  <groupId>org.apache.zipkin</groupId>
+  <artifactId>zipkin-parent</artifactId>
+  <version>2.14.0</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>zipkin</module>
+    <module>zipkin-tests</module>
+    <module>zipkin-ui</module>
+    <module>zipkin-lens</module>
+    <module>zipkin-junit</module>
+    <module>benchmarks</module>
+    <module>zipkin-storage</module>
+    <module>zipkin-collector</module>
+    <module>zipkin-server</module>
+  </modules>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <!-- default bytecode version for src/main -->
+    <main.java.version>1.7</main.java.version>
+    <main.signature.artifact>java17</main.signature.artifact>
+
+    <!-- override to set exclusions per-project -->
+    <errorprone.args />
+    <errorprone.version>2.3.3</errorprone.version>
+
+    <main.basedir>${project.basedir}</main.basedir>
+
+    <armeria.version>0.85.0</armeria.version>
+    <!-- This is from armeria, but be careful to avoid >= v20 apis -->
+    <guava.version>27.1-jre</guava.version>
+
+    <!-- only used for proto interop testing -->
+    <wire.version>3.0.0-alpha01</wire.version>
+    <unpack-proto.directory>${project.build.directory}/test/proto</unpack-proto.directory>
+
+    <brave.version>5.6.3</brave.version>
+    <cassandra-driver-core.version>3.7.1</cassandra-driver-core.version>
+    <okhttp.version>3.14.1</okhttp.version>
+    <okio.version>1.17.4</okio.version>
+    <jooq.version>3.11.11</jooq.version>
+    <micrometer.version>1.1.4</micrometer.version>
+    <spring-boot.version>2.1.5.RELEASE</spring-boot.version>
+    <!-- MySQL connector is GPL, even if it has an OSS exception.
+         https://www.mysql.com/about/legal/licensing/foss-exception/
+
+         MariaDB has a friendlier license, LGPL, which is less scary in audits.
+    -->
+    <mariadb-java-client.version>2.4.1</mariadb-java-client.version>
+    <!-- Java 8 dep, which is ok as zipkin-mysql is Java 8 anyway -->
+    <HikariCP.version>3.3.1</HikariCP.version>
+    <log4j.version>2.11.2</log4j.version>
+
+    <junit.version>4.12</junit.version>
+    <powermock.version>2.0.2</powermock.version>
+    <!-- Up to v2.27.0 of mockito has a conflict https://github.com/mockito/mockito/issues/1606
+    java.lang.NoSuchMethodError: net.bytebuddy.dynamic.loading.MultipleParentClassLoader$Builder.appendMostSpecific(Ljava/util/Collection;)Lnet/bytebuddy/dynamic/loading/MultipleParentClassLoader$Builder
+    -->
+    <mockito.version>2.23.4</mockito.version>
+    <assertj.version>3.12.2</assertj.version>
+    <hamcrest.version>1.3</hamcrest.version>
+    <testcontainers.version>1.11.2</testcontainers.version>
+
+    <auto-value.version>1.6.5</auto-value.version>
+    <animal-sniffer-maven-plugin.version>1.17</animal-sniffer-maven-plugin.version>
+    <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+    <maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
+    <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
+    <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>
+    <license-maven-plugin.version>3.0</license-maven-plugin.version>
+    <maven-jar-plugin.version>3.1.2</maven-jar-plugin.version>
+    <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
+    <maven-failsafe-plugin.version>3.0.0-M3</maven-failsafe-plugin.version>
+    <maven-enforcer-plugin.version>3.0.0-M2</maven-enforcer-plugin.version>
+  </properties>
+
+  <name>Zipkin (Parent)</name>
+  <description>Zipkin (Parent)</description>
+  <url>https://github.com/apache/incubator-zipkin</url>
+  <inceptionYear>2015</inceptionYear>
+
+  <organization>
+    <name>The Apache Software Foundation</name>
+    <url>http://www.apache.org/</url>
+  </organization>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>https://github.com/apache/incubator-zipkin</url>
+    <connection>scm:git:https://github.com/apache/incubator-zipkin.git</connection>
+    <developerConnection>scm:git:https://github.com/apache/incubator-zipkin.git</developerConnection>
+    <tag>v2.14.0</tag>
+  </scm>
+
+  <!-- Developer section is needed for Maven Central, but doesn't need to include each person -->
+  <developers>
+    <developer>
+      <id>openzipkin</id>
+      <name>OpenZipkin Gitter</name>
+      <url>https://gitter.im/openzipkin/zipkin</url>
+    </developer>
+  </developers>
+
+  <mailingLists>
+    <mailingList>
+      <name>Zipkin Developer List</name>
+      <post>dev@zipkin.apache.org</post>
+      <subscribe>dev-subscribe@zipkin.apache.org</subscribe>
+      <unsubscribe>dev-unsubscribe@zipkin.apache.org</unsubscribe>
+    </mailingList>
+    <mailingList>
+      <name>Zipkin Commits</name>
+      <post>commits@zipkin.apache.org</post>
+      <subscribe>commits-subscribe@zipkin.apache.org</subscribe>
+      <unsubscribe>commits-unsubscribe@zipkin.apache.org</unsubscribe>
+    </mailingList>
+  </mailingLists>
+
+  <distributionManagement>
+    <repository>
+      <id>apache.releases.https</id>
+      <url>https://repository.apache.org/service/local/staging/deploy/maven2</url>
+    </repository>
+    <snapshotRepository>
+      <id>apache.snapshots.https</id>
+      <url>https://repository.apache.org/content/repositories/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <issueManagement>
+    <system>Github</system>
+    <url>https://github.com/apache/incubator-zipkin/issues</url>
+  </issueManagement>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>javax.annotation</groupId>
+        <artifactId>javax.annotation-api</artifactId>
+        <version>1.3.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jooq</groupId>
+        <artifactId>jooq</artifactId>
+        <version>${jooq.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.linecorp.armeria</groupId>
+        <artifactId>armeria-spring-boot-autoconfigure</artifactId>
+        <version>${armeria.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.linecorp.armeria</groupId>
+            <artifactId>armeria-logback</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>com.linecorp.armeria</groupId>
+        <artifactId>armeria-tomcat</artifactId>
+        <version>${armeria.version}</version>
+      </dependency>
+
+      <!-- Makes sure spring doesn't eagerly bind tomcat or slf4j -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+        <version>${spring-boot.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-actuator</artifactId>
+        <version>${spring-boot.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <!-- End spring-boot-dependencies overrides -->
+
+      <dependency>
+        <groupId>com.squareup.okhttp3</groupId>
+        <artifactId>okhttp</artifactId>
+        <version>${okhttp.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.squareup.okhttp3</groupId>
+        <artifactId>mockwebserver</artifactId>
+        <version>${okhttp.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.squareup.okio</groupId>
+        <artifactId>okio</artifactId>
+        <version>${okio.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.squareup.moshi</groupId>
+        <artifactId>moshi</artifactId>
+        <version>1.8.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.google.auto.value</groupId>
+        <artifactId>auto-value-annotations</artifactId>
+        <version>${auto-value.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.auto.value</groupId>
+        <artifactId>auto-value</artifactId>
+        <version>${auto-value.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-api</artifactId>
+        <version>${log4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>${log4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-jul</artifactId>
+        <version>${log4j.version}</version>
+      </dependency>
+      <!-- used by our non-spring boot tests who have a slf4j dependency -->
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-slf4j-impl</artifactId>
+        <version>${log4j.version}</version>
+      </dependency>
+      <!-- used by zipkin-server and zipkin-autoconfigure due to Spring Boot using slf4j -->
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-to-slf4j</artifactId>
+        <version>${log4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-1.2-api</artifactId>
+        <version>${log4j.version}</version>
+      </dependency>
+
+      <!-- for testing flink -->
+      <dependency>
+        <groupId>com.esotericsoftware.kryo</groupId>
+        <artifactId>kryo</artifactId>
+        <version>2.24.0</version>
+      </dependency>
+
+      <!-- Internal classes used in SpanBytesDecoder.JSON_V[12] -->
+      <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.8.5</version>
+      </dependency>
+
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${assertj.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>${mockito.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers</artifactId>
+        <version>${testcontainers.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>mysql</artifactId>
+        <version>${testcontainers.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.mariadb.jdbc</groupId>
+        <artifactId>mariadb-java-client</artifactId>
+        <version>${mariadb-java-client.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.zaxxer</groupId>
+        <artifactId>HikariCP</artifactId>
+        <version>${HikariCP.version}</version>
+      </dependency>
+
+      <!-- Don't bring in brave's transitive dep on zipkin -->
+      <dependency>
+        <groupId>io.zipkin.brave</groupId>
+        <artifactId>brave</artifactId>
+        <version>${brave.version}</version>
+        <exclusions>
+          <!-- TODO: this exclusion will drift when brave switches to apache zipkin -->
+          <exclusion>
+            <groupId>io.zipkin.zipkin2</groupId>
+            <artifactId>zipkin</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.zipkin.proto3</groupId>
+        <artifactId>zipkin-proto3</artifactId>
+        <version>0.2.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.wire</groupId>
+        <artifactId>wire-runtime</artifactId>
+        <version>${wire.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- mvn -N io.takari:maven:wrapper generates the ./mvnw script -->
+        <plugin>
+          <groupId>io.takari</groupId>
+          <artifactId>maven</artifactId>
+          <version>0.7.6</version>
+          <configuration>
+            <maven>3.6.1</maven>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven-compiler-plugin.version}</version>
+          <inherited>true</inherited>
+          <configuration>
+            <!-- Retrolambda will rewrite lambdas as Java 6 bytecode -->
+            <source>1.8</source>
+            <target>1.8</target>
+            <!-- or die! com.sun.tools.javac.api.JavacTool -->
+            <fork>true</fork>
+            <showWarnings>true</showWarnings>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven-javadoc-plugin.version}</version>
+          <configuration>
+            <failOnError>false</failOnError>
+            <excludePackageNames>zipkin2.internal,zipkin2.internal.*</excludePackageNames>
+            <!-- hush pedantic warnings: we don't put param and return on everything! -->
+            <doclint>none</doclint>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${maven-jar-plugin.version}</version>
+          <configuration>
+            <archive>
+              <!-- prevents huge pom file from also being added to the jar under META-INF/maven -->
+              <addMavenDescriptor>false</addMavenDescriptor>
+            </archive>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>${maven-shade-plugin.version}</version>
+        </plugin>
+
+        <!-- Need to block import of shaded packages in bnd.bnd as maven bundle plugin analyzes the unshaded jar -->
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>4.2.0</version>
+          <configuration>
+            <obrRepository>NONE</obrRepository>
+            <instructions>
+              <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+            </instructions>
+          </configuration>
+          <executions>
+            <execution>
+              <phase>process-classes</phase>
+              <goals>
+                <goal>manifest</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <versionRange>[3.7,)</versionRange>
+                    <goals>
+                      <goal>compile</goal>
+                      <goal>testCompile</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <configurator>
+                      <id>org.eclipse.m2e.jdt.javaConfigurator</id>
+                    </configurator>
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+
+        <!-- The below plugins compile protobuf stubs in the indicated source tree -->
+        <plugin>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <executions>
+            <!-- wire-maven-plugin cannot get proto definitions from dependencies: this will -->
+            <execution>
+              <id>unpack-proto</id>
+              <phase>generate-sources</phase>
+              <goals>
+                <goal>unpack-dependencies</goal>
+              </goals>
+              <configuration>
+                <includeArtifactIds>zipkin-proto3</includeArtifactIds>
+                <includes>**/*.proto</includes>
+                <outputDirectory>${unpack-proto.directory}</outputDirectory>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>com.squareup.wire</groupId>
+          <artifactId>wire-maven-plugin</artifactId>
+          <version>${wire.version}</version>
+          <executions>
+            <execution>
+              <phase>generate-sources</phase>
+              <goals>
+                <goal>generate-sources</goal>
+              </goals>
+              <configuration>
+                <protoSourceDirectory>${unpack-proto.directory}</protoSourceDirectory>
+                <includes>
+                  <include>zipkin.proto3.*</include>
+                </includes>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <!-- Top-level to ensure our server can use JDK 1.8
+             (by checking we don't accidentally use later apis) -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>animal-sniffer-maven-plugin</artifactId>
+        <version>${animal-sniffer-maven-plugin.version}</version>
+        <configuration>
+          <signature>
+            <groupId>org.codehaus.mojo.signature</groupId>
+            <artifactId>${main.signature.artifact}</artifactId>
+            <version>1.0</version>
+          </signature>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${maven-failsafe-plugin.version}</version>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>${maven-failsafe-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>integration-test</id>
+            <goals>
+              <goal>integration-test</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>verify</id>
+            <goals>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-install-plugin</artifactId>
+        <version>${maven-install-plugin.version}</version>
+      </plugin>
+
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>${license-maven-plugin.version}</version>
+        <configuration>
+          <!-- session.executionRootDirectory resolves properly even with nested modules -->
+          <header>${main.basedir}/src/etc/header.txt</header>
+          <mapping>
+            <!-- Don't use javadoc style as this makes code formatters break it by adding tags! -->
+            <java>SLASHSTAR_STYLE</java>
+            <kt>SLASHSTAR_STYLE</kt>
+            <bnd>SCRIPT_STYLE</bnd>
+            <ejs>XML_STYLE</ejs>
+            <scss>DOUBLESLASH_STYLE</scss>
+          </mapping>
+          <excludes>
+            <exclude>.travis.yml</exclude>
+            <exclude>.editorconfig</exclude>
+            <exclude>.gitattributes</exclude>
+            <exclude>.gitignore</exclude>
+            <exclude>.mvn/**</exclude>
+            <exclude>mvnw*</exclude>
+            <exclude>etc/header.txt</exclude>
+            <exclude>**/.idea/**</exclude>
+            <exclude>**/node_modules/**</exclude>
+            <exclude>**/.babelrc</exclude>
+            <exclude>**/.bowerrc</exclude>
+            <exclude>**/.editorconfig</exclude>
+            <exclude>**/.eslintrc</exclude>
+            <exclude>**/.eslintrc</exclude>
+            <exclude>**/.eslintrc.js</exclude>
+
+            <!-- remove when deleting zipkin-ui #2569 -->
+            <exclude>**/chosen.*</exclude>
+	          <exclude>**/dagre-d3.*</exclude>
+
+            <exclude>**/testdata/**/*.json</exclude>
+            <exclude>**/test/data/**/*.json</exclude>
+            <exclude>LICENSE</exclude>
+            <exclude>DISCLAIMER</exclude>
+            <exclude>DEPENDENCIES</exclude>
+            <exclude>NOTICE</exclude>
+            <exclude>Jenkinsfile</exclude>
+            <exclude>**/*.md</exclude>
+            <exclude>**/src/main/resources/banner.txt</exclude>
+            <exclude>**/src/main/resources/*.yml</exclude>
+            <exclude>**/spring.factories</exclude>
+            <!-- Cassandra integration tests break when license headers are present -->
+            <exclude>**/src/main/resources/*.cql</exclude>
+            <exclude>kafka_*/**</exclude>
+            <exclude>**/nohup.out</exclude>
+            <exclude>src/test/resources/**</exclude>
+            <exclude>**/generated/**</exclude>
+          </excludes>
+          <strictCheck>true</strictCheck>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>compile</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>${maven-enforcer-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>enforce-java</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireJavaVersion>
+                  <version>[1.8,12)</version>
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <version>0.13</version>
+        <configuration>
+          <excludes>
+            <exclude>**/target/**</exclude>
+
+            <!-- IDE files -->
+            <exclude>**/*.iml</exclude>
+            <exclude>**/.idea/**</exclude>
+            <exclude>**/*.classpath</exclude>
+            <exclude>**/.project</exclude>
+            <exclude>**/.settings/**</exclude>
+            <exclude>**/dependency-reduced-pom.xml</exclude>
+
+            <!-- git files -->
+            <exclude>**/.gitignore</exclude>
+            <exclude>**/.gitmodules</exclude>
+            <exclude>**/.git/**</exclude>
+
+            <!-- CI files -->
+            <exclude>**/.travis.yml</exclude>
+
+            <!-- GitHub files -->
+            <exclude>**/.github/**</exclude>
+
+            <!-- Generated files -->
+            <exclude>**/generated/**</exclude>
+
+            <!-- document files -->
+            <exclude>**/*.md</exclude>
+
+            <!-- Cassandra integration tests break when license headers are present -->
+            <exclude>**/src/main/resources/*.cql</exclude>
+
+            <!-- spring boot config -->
+            <exclude>**/src/main/resources/banner.txt</exclude>
+            <exclude>**/src/main/resources/*.yml</exclude>
+            <exclude>**/spring.factories</exclude>
+
+            <!-- json test data and config -->
+            <exclude>**/*.json</exclude>
+
+            <!-- test assets -->
+            <exclude>**/src/test/resources/**</exclude>
+
+            <!-- UI cache -->
+            <exclude>**/node_modules/**</exclude>
+
+            <!-- UI configs -->
+            <exclude>**/.babelrc</exclude>
+            <exclude>**/.bowerrc</exclude>
+            <exclude>**/.editorconfig</exclude>
+            <exclude>**/.eslintrc</exclude>
+            <exclude>**/.eslintrc.js</exclude>
+
+            <!-- remove when deleting zipkin-ui #2569 -->
+            <exclude>**/chosen.*</exclude>
+            <exclude>**/dagre-d3.*</exclude>
+
+            <!-- Maven Wrapper generated files -->
+            <exclude>.mvn/wrapper/maven-wrapper.properties</exclude>
+
+            <!-- on-demand resources created in CI for integration tests -->
+            <exclude>kafka_*/**</exclude>
+            <exclude>**/nohup.out</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- org.apache:apache:21 sets maven-remote-resources-plugin in plugins, not pluginManagement
+           This results in execution in the parent project, and a side effect of an empty
+           DEPENDENCIES file in the assembly when packaged with the apache-release profile.
+
+           https://issues.apache.org/jira/browse/MPOM-218
+
+           This works around the problem by skipping at the parent level at the cost of having to
+           un-skip it at every deployed child.
+       -->
+      <plugin>
+        <artifactId>maven-remote-resources-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>error-prone-1.8</id>
+      <activation>
+        <jdk>1.8</jdk>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <executions>
+              <execution>
+                <!-- only use errorprone on main source tree -->
+                <id>default-compile</id>
+                <phase>compile</phase>
+                <goals>
+                  <goal>compile</goal>
+                </goals>
+                <configuration>
+                  <compilerId>javac-with-errorprone</compilerId>
+                  <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                  <compilerArgs>
+                    <arg>${errorprone.args}</arg>
+                  </compilerArgs>
+                </configuration>
+              </execution>
+            </executions>
+            <dependencies>
+              <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-compiler-javac-errorprone</artifactId>
+                <version>2.8.5</version>
+              </dependency>
+              <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_core</artifactId>
+                <version>${errorprone.version}</version>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>error-prone-9+</id>
+      <activation>
+        <jdk>[9,)</jdk>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <executions>
+              <execution>
+                <!-- only use errorprone on main source tree -->
+                <id>default-compile</id>
+                <phase>compile</phase>
+                <goals>
+                  <goal>compile</goal>
+                </goals>
+                <configuration>
+                  <forceJavacCompilerUse>true</forceJavacCompilerUse>
+                  <compilerArgs>
+                    <arg>-XDcompilePolicy=simple</arg>
+                    <arg>-Xplugin:ErrorProne ${errorprone.args}</arg>
+                  </compilerArgs>
+                  <annotationProcessorPaths>
+                    <processorPath>
+                      <groupId>com.google.errorprone</groupId>
+                      <artifactId>error_prone_core</artifactId>
+                      <version>${errorprone.version}</version>
+                    </processorPath>
+                    <!-- auto-value is placed here eventhough not needed for all projects as
+                         configuring along with errorprone is tricky in subprojects -->
+                    <processorPath>
+                      <groupId>com.google.auto.value</groupId>
+                      <artifactId>auto-value</artifactId>
+                      <version>${auto-value.version}</version>
+                    </processorPath>
+                  </annotationProcessorPaths>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>apache-release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>source-release-assembly</id>
+                <configuration>
+                  <!-- make the source release zip includes the word incubating -->
+                  <finalName>apache-zipkin-incubating-${project.version}</finalName>
+                  <descriptors>
+                    <descriptor>src/main/assemblies/source-release.xml</descriptor>
+                  </descriptors>
+                  <!-- don't inherit the source-release as we are overriding it -->
+                  <descriptorRefs combine.self="override" />
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>netbeans</id>
+      <activation>
+          <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <!-- NetBeans -->
+        <org-netbeans-modules-editor-indent.CodeStyle.usedProfile>project</org-netbeans-modules-editor-indent.CodeStyle.usedProfile>
+        <org-netbeans-modules-editor-indent.CodeStyle.project.indent-shift-width>2</org-netbeans-modules-editor-indent.CodeStyle.project.indent-shift-width>
+        <org-netbeans-modules-editor-indent.CodeStyle.project.spaces-per-tab>2</org-netbeans-modules-editor-indent.CodeStyle.project.spaces-per-tab>
+        <org-netbeans-modules-editor-indent.CodeStyle.project.tab-size>2</org-netbeans-modules-editor-indent.CodeStyle.project.tab-size>
+        <org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>110</org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>
+        <org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>true</org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>
+      </properties>
+    </profile>
+  </profiles>
+</project>
